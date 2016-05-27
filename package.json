@@ -1,0 +1,15 @@
+{
+  "name": "wunderlist-parser",
+  "version": "1.0.0",
+  "description": "Parse text data into wunderlist list of taskss ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mohammad Mohammad (AlahmadiQ8)",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^2.4.2",
+    "express": "^4.13.4"
+  }
+}
