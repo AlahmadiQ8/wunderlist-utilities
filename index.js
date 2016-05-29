@@ -40,7 +40,7 @@ app.use(session({
 
 
 // index: main view 
-app.get('/', function(request, response) {
+app.get('/', function(req, res) {
   if (req.session.token) {
     console.log('already logged in')
   }
