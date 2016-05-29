@@ -41,10 +41,12 @@ app.use(session({
 
 // index: main view 
 app.get('/', function(req, res) {
-  if (req.session.token) {
-    console.log('already logged in')
+  if (typeof(req.session.token) == "undefined") {
+    var button = {text: 'Login', href: '/auth'}
+  } else {
+    var button = {text: 'Logout', href: '/logout'}
   }
-  res.render('pages/index');  
+  res.render('pages/index', {button: button});  
 });
 
 
@@ -56,6 +58,8 @@ app.get('/auth', function (req, res) {
                                redirect_uri: 'http://wunderlist-parser.herokuapp.com/callback',
                                state: process.env.SECRET} ))
 });
+
+
 
 
 // Wunderlist redirects back to your site
