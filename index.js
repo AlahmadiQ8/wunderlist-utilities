@@ -44,7 +44,7 @@ app.get('/', function(req, res) {
   if (req.session.token) {
     console.log('already logged in')
   }
-  response.render('pages/index');  
+  res.render('pages/index');  
 });
 
 
