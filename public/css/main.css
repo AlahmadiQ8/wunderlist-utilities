@@ -1,3 +1,35 @@
+body {
+  font-family: 'Lato', 'Open Sans', sans-serif;
+  color: #666;
+}
+
+@media (min-width: 300px) {
+  .btn.btn-block {
+    width: 90%;}
+  .btn.btn-lg {
+    padding: 18px 16px;
+    font-size: 28px;
+    margin: 45px auto;
+  }
+}
+@media (min-width: 786px) {
+  .btn.btn-block {
+    width: 90%;}
+  .btn.btn-lg {
+    padding: 10px 16px;
+    font-size: 20px;
+    margin: 0 auto;
+  }
+}
+
+.btn.btn-default {
+  color: #fff;
+  background-color: #2196F3;
+  border-style: none; }
+  .btn.btn-lg {
+    border-radius: 3px;
+  }
+
 .jumbotron {
   background: #F44336;
   color: white; 
