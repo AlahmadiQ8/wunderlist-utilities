@@ -44,6 +44,7 @@ app.get('/callback', function(req, res){
     res.sendStatus(403);
   } else {
     console.log(req.query.code)
+    res.send('authentication sucess!')
   }
 })
 
