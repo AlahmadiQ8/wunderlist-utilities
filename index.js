@@ -48,7 +48,7 @@ app.get('/callback', function(req, res){
     res.sendStatus(403);
   } else {
     console.log(req.query.code)
-    api.getToken(req.query.code, function(err, res, json) {
+    api.getToken(req.query.code, function(err, apires, json) {
       if (err) {
         console.log(err)
       } else {
