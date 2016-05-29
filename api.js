@@ -3,7 +3,7 @@ var request = require('request');
 
 module.exports = {
 
-  function getToken(code, callback) {
+  getToken: function getToken(code, callback) {
     request.post({
       url: 'https://www.wunderlist.com/oauth/access_token',
       json: {
