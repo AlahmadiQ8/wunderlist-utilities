@@ -2,8 +2,8 @@ var crypto = require('crypto');
 var querystring = require('querystring');
 var express = require('express');
 var bodyParser = require('body-parser');
-;
-;
+
+
 const secret = crypto.randomBytes(16).toString('hex');
 var app = express();
 
@@ -30,7 +30,7 @@ app.get('/', function(request, response) {
 
 // Redirect user to authenticate 
 app.get('/auth', function (req, res) {
-  // res.urlencoded({test : 'pages/index'})
+  // res.redirect('https://www.google.com/')
   res.redirect('https://www.wunderlist.com/oauth/authorize?' +
        querystring.stringify( { client_id: process.env.CLIENT_ID,
                                redirect_uri: 'http://wunderlist-parser.herokuapp.com/callback',
@@ -40,7 +40,11 @@ app.get('/auth', function (req, res) {
 
 // Wunderlist redirects back to your site
 app.get('/callback', function(req, res){
-  console.log(res.body)
+  if (req.query.state !== secret) {
+    res.sendStatus(403);
+  } else {
+    console.log(req.query.code)
+  }
 })
 
 
