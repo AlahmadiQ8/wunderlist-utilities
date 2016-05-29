@@ -49,8 +49,11 @@ app.get('/callback', function(req, res){
   } else {
     console.log(req.query.code)
     api.getToken(req.query.code, function(err, res, json) {
-      if (err) {console.log(err)};
-      else {console.log(json)};
+      if (err) {
+        console.log(err)
+      } else {
+        console.log(json)
+      };
       res.send('authentication sucess!');
     })
     
