@@ -1,7 +1,7 @@
 
 var request = require('request');
 
-module.exports = function() {
+module.exports = {
 
   function getToken(code, callback) {
     request.post({
