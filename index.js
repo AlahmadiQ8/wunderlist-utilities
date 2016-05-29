@@ -5,12 +5,13 @@ var https = require('https')
 var express = require('express');
 var bodyParser = require('body-parser');
 var session = require('express-session')
+var FileStore = require('session-file-store')(session);
 var morgan = require('morgan')
 
 var api = require('./api.js')
 
 var app = express();
-var FileStore = require('session-file-store')(session);
+
 
 app.set('port', (process.env.PORT || 5000));
 app.use(express.static(__dirname + '/public'));
@@ -52,14 +53,18 @@ app.get('/', function(req, res) {
 
 // Redirect user to authenticate 
 app.get('/auth', function (req, res) {
-  // res.redirect('https://www.google.com/')
   res.redirect('https://www.wunderlist.com/oauth/authorize?' +
        querystring.stringify( { client_id: process.env.CLIENT_ID,
                                redirect_uri: 'http://wunderlist-parser.herokuapp.com/callback',
                                state: process.env.SECRET} ))
 });
 
-
+// Logout 
+app.get('/auth', (req, res) => {
+  req.session.destroy( ()=> {
+    res.redirect('/')
+  })
+})
 
 
 // Wunderlist redirects back to your site
