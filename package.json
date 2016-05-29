@@ -1,16 +1,19 @@
 {
+  "scripts": {
+    "start": "NODE_ENV=development nodemon --debug server.js app",
+    "deploy": "git commit -a -m 'deploy'; git push heroku master; heroku open;"
+  },
   "name": "wunderlist-parser",
   "version": "1.0.0",
   "description": "Parse text data into wunderlist list of taskss ",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "author": "Mohammad Mohammad (AlahmadiQ8)",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.15.1",
     "ejs": "^2.4.2",
-    "express": "^4.13.4"
+    "express": "^4.13.4",
+    "express-session": "^1.13.0",
+    "request": "^2.72.0"
   }
 }
