@@ -11,7 +11,7 @@ module.exports = {
         client_secret: process.env.CLIENT_SECRET,
         code: code,
       }
-    }, callback(error, res, json));
+    }, callback);
   }
 
 }
