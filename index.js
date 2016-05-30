@@ -60,7 +60,7 @@ app.get('/auth', function (req, res) {
 });
 
 // Logout 
-app.get('/auth', (req, res) => {
+app.get('/logout', (req, res) => {
   req.session.destroy( ()=> {
     res.redirect('/')
   })
@@ -80,12 +80,17 @@ app.get('/callback', function(req, res){
         console.log(json)
         req.session.token = json.access_token;
       };
-      res.send('authentication sucess!');
+      res.redirect('/parse-tasks');
     })
     
   }
 })
 
+
+// test page 
+app.get('/parse-tasks', function(req, res){
+  res.render('pages/parse-tasks')
+})
 
 // run app
 app.listen(app.get('port'), '0.0.0.0', function() {

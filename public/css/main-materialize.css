@@ -1,0 +1,77 @@
+body {
+  margin-top: 50px;
+  background-color: #fafafa;
+  font-size: 16px;
+  color: #616161;
+}
+
+.divider {
+  border-bottom: 8px solid #eee;
+  margin-bottom: 30px;
+}
+
+/* label color */
+.input-field label {
+ color: #9e9e9e;
+}
+/* icon prefix focus color */
+.input-field .prefix.active {
+ color: #9e9e9e;
+}
+.last{
+  font-size: 16px;
+  margin-top: 20px;
+}
+
+
+
+/* label focus color */
+.input-field input[type=text]:focus + label {
+ color: #E57373;
+}
+/* label underline focus color */
+.input-field input[type=text]:focus {
+ border-bottom: 1px solid #E57373;
+ box-shadow: 0 1px 0 0 #E57373;
+}
+/* valid color */
+.input-field input[type=text].valid {
+ border-bottom: 1px solid #E57373;
+ box-shadow: 0 1px 0 0 #E57373;
+}
+/* invalid color */
+.input-field input[type=text].invalid {
+ border-bottom: 1px solid #E57373;
+ box-shadow: 0 1px 0 0 #E57373;
+}
+.input-field input[type=text] {
+ border-bottom: 1px solid #64b5f6;
+ box-shadow: 0 1px 0 0 #64b5f6;
+}
+
+
+/* label focus color */
+.input-field textarea:focus:not([readonly]) + label {
+ color: #E57373;
+}
+/* label underline focus color */
+.input-field textarea:focus:not([readonly]) {
+ border-bottom: 1px solid #E57373;
+ box-shadow: 0 1px 0 0 #E57373;
+}
+/* valid color */
+.input-field textarea.valid {
+ border-bottom: 1px solid #E57373;
+ box-shadow: 0 1px 0 0 #E57373;
+}
+/* invalid color */
+.input-field textarea.invalid {
+ border-bottom: 1px solid #E57373;
+ box-shadow: 0 1px 0 0 #E57373;
+}
+.input-field textarea {
+ border-bottom: 1px solid #64b5f6;
+ box-shadow: 0 1px 0 0 #64b5f6;
+}
+
+
