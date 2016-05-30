@@ -113,13 +113,13 @@ app.get('/parser', function(req, res){
 app.post('/parser', function(req, res){
   var title = req.body.title
   api.createList(req.session.token, title, function(err, apires, json){
-    if (!error && response.statusCode == 201) {
+    if (!err && apires.statusCode == 201) {
       req.session.success = `<b>${title}</b> list created...`
     }
     console.log(json)
+    res.redirect('/parser')
   })
-  req.session.error = 'omg omg succeeded'
-  res.redirect('/parser')
+  
 })
 
 // run app
