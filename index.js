@@ -130,7 +130,6 @@ app.post('/parser', function(req, res){
   if (!tasks.length) {
     req.session.error = '<b>Error:</b> No tasks given in the tasks feild'
   }
-  var msg = '';
 
   // create list
   api.createList(req.session.token, title, function(err, apires, json){
@@ -138,7 +137,6 @@ app.post('/parser', function(req, res){
     // check successful api call 
     testApiCall(res, err, apires, json)
 
-    msg += `<b>${title}</b> list created...<br>`
     var listId = json.id;
 
     // forEach is synch (blocking). but should switch to promises in the future 
@@ -148,12 +146,11 @@ app.post('/parser', function(req, res){
 
         // check successful api call 
         testApiCall(res, errTask, apiresTask, jsonTask)
-        console.log(msg)
-        msg += `<b>${task}</b> task created...<br>`
+
       })
     })
 
-    if (msg.length) req.session.success = msg;
+    req.session.success = `<b>${title}</b> list created successfully`;
     res.redirect('/parser')
   })
   
