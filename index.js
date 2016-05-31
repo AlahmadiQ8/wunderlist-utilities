@@ -148,6 +148,7 @@ app.post('/parser', function(req, res){
 
         // check successful api call 
         testApiCall(res, errTask, apiresTask, jsonTask)
+        console.log(msg)
         msg += `<b>${task}</b> task created...\n`
       })
     })
