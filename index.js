@@ -138,7 +138,7 @@ app.post('/parser', function(req, res){
     // check successful api call 
     testApiCall(res, err, apires, json)
 
-    msg += `<b>${title}</b> list created...\n`
+    msg += `<b>${title}</b> list created...<br>`
     var listId = json.id;
 
     // forEach is synch (blocking). but should switch to promises in the future 
@@ -149,7 +149,7 @@ app.post('/parser', function(req, res){
         // check successful api call 
         testApiCall(res, errTask, apiresTask, jsonTask)
         console.log(msg)
-        msg += `<b>${task}</b> task created...\n`
+        msg += `<b>${task}</b> task created...<br>`
       })
     })
 
