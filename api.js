@@ -27,6 +27,14 @@ module.exports = {
       headers : headers(token),
       json : { title : title },
       }, callback)
+  },
+
+  createTask: function createTask(token, listId, task, callback) {
+    request.post({
+      url : 'https://a.wunderlist.com/api/v1/tasks',
+      headers : headers(token),
+      json : { list_id: listId, title: task, completed: false }
+    }, callback)
   }
 
 }

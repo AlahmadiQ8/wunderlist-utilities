@@ -56,6 +56,18 @@ app.use(function(req, res, next){
   next();
 });
 
+// test api call
+function testApiCall(res, err, apires, json){
+  if (err) {
+    console.log(err)
+    res.status(500)
+    req.session.error = '<b>500</b> server error occured.'
+    res.redirect('/parser')
+  } else if (apires.statusCode != 201) {
+    req.session.error = `<b>${json.error.type}</b> ${json.error.message}`
+    res.redirect('/parser')
+  }
+}
 
 // index: main view 
 app.get('/', function(req, res) {
@@ -111,12 +123,36 @@ app.get('/parser', function(req, res){
 })
 
 app.post('/parser', function(req, res){
-  var title = req.body.title
+  var title = req.body.title;
+  var tasks = req.body.tasks.split(/\r?\n/).filter(function(str) {
+    return /\S/.test(str);
+  })
+  if (!tasks.length) {
+    req.session.error = '<b>Error:</b> No tasks given in the tasks feild'
+  }
+  var msg = '';
+
+  // create list
   api.createList(req.session.token, title, function(err, apires, json){
-    if (!err && apires.statusCode == 201) {
-      req.session.success = `<b>${title}</b> list created...`
-    }
-    console.log(json)
+
+    // check successful api call 
+    testApiCall(res, err, apires, json)
+
+    msg += `<b>${title}</b> list created...\n`
+    var listId = json.id;
+
+    // forEach is synch (blocking). but should switch to promises in the future 
+    // create tasks
+    tasks.forEach(function(task, index, arr) {
+      api.createTask(req.session.token, listId, task, function(errTask, apiresTask, jsonTask){
+
+        // check successful api call 
+        testApiCall(res, errTask, apiresTask, jsonTask)
+        msg += `<b>${task}</b> task created...\n`
+      })
+    })
+
+    if (msg.length) req.session.success = msg;
     res.redirect('/parser')
   })
   

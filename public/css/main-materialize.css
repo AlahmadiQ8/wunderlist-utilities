@@ -29,7 +29,7 @@ body {
   font-size: 16px;
   margin-top: 20px;
 }
-button.create-list:active {
+button.create-list:active, button.create-list:focus {
   background-color: inherit;
 }
 
@@ -45,8 +45,8 @@ button.create-list:active {
 }
 /* valid color */
 .input-field input[type=text].valid {
- border-bottom: 1px solid #E57373;
- box-shadow: 0 1px 0 0 #E57373;
+ border-bottom: 1px solid #64b5f6;
+ box-shadow: 0 1px 0 0 #64b5f6;
 }
 /* invalid color */
 .input-field input[type=text].invalid {
@@ -70,8 +70,8 @@ button.create-list:active {
 }
 /* valid color */
 .input-field textarea.valid {
- border-bottom: 1px solid #E57373;
- box-shadow: 0 1px 0 0 #E57373;
+ border-bottom: 1px solid #64b5f6;
+ box-shadow: 0 1px 0 0 #64b5f6;
 }
 /* invalid color */
 .input-field textarea.invalid {

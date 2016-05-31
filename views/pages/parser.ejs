@@ -24,14 +24,16 @@
 
           <div class="input-field">
             <i class="material-icons prefix grey-text">assignment</i>
-            <input id="list_title" type="text" name='title' class="validate" pattern=".{6,}" required title="Six or more characters">
+            <input id="list_title" type="text" name='title' class="validate" pattern="\w*" required title="Cannot be empty">
             <label for="list_title">List Title</label>
           </div>
           <div class="input-field">
             <i class="material-icons prefix grey-text">mode_edit</i>
-            <textarea id="textarea1" name='tasks' class="materialize-textarea"></textarea>
+            <textarea id="textarea1" name='tasks' class="materialize-textarea" required></textarea>
             <label for="textarea1">Tasks</label>
           </div>
+
+          <p class='notes grey-text right-align'>* Empty lines are ignored</p>
 
         </div> <!-- end of card-content -->
         <div class="card-action center-align blue lighten-2">
