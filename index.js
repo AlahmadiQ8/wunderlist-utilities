@@ -1,22 +1,20 @@
-var crypto = require('crypto');
+
+var express     = require('express');
 var querystring = require('querystring');
-var https = require('https')
+var bodyParser  = require('body-parser');
+var client      = require('redis').createClient(process.env.REDIS_URL);
+var session     = require('express-session')
+var RedisStore  = require('connect-redis')(session);
+var morgan      = require('morgan')
+var api         = require('./api.js')
 
-var express = require('express');
-var bodyParser = require('body-parser');
-var session = require('express-session')
-var FileStore = require('session-file-store')(session);
-var morgan = require('morgan')
-
-var api = require('./api.js')
-
-var app = express();
+var app         = express();
 
 app.set('port', (process.env.PORT || 5000));
 app.use(express.static(__dirname + '/public'));
 app.use(morgan('dev'));
 
-// views is directory for all template files
+// Views is directory for all template files
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
@@ -24,7 +22,7 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-// session configuration
+// Session configuration
 app.use(session({
   name: 'server-session-cookie-id',
   secret: process.env.SECRET,
@@ -32,7 +30,7 @@ app.use(session({
   cookie: { httpOnly: true, 
             secure: false, 
             maxAge: null,},
-  store: new FileStore(),
+  store: new RedisStore({client: client}),
   resave: false,
 }))
 
@@ -44,6 +42,7 @@ var flash = function(type, text) {
     classes: classes,
     text: text + '<i class="material-icons">close</i>'}
 };
+
 // Session-persisted flash message middleware
 app.use(function(req, res, next){
   var err = req.session.error;
@@ -56,25 +55,23 @@ app.use(function(req, res, next){
   next();
 });
 
-// test api call
-function testApiCall(res, err, apires, json){
+// Process api call
+function processApiCall(res, err, apires, json){
   if (err) {
-    console.log(err)
-    res.status(500)
-    req.session.error = '<b>500</b> server error occured.'
-    res.redirect('/parser')
+    console.log(err);
+    res.sendStatus(500);
   } else if (apires.statusCode != 201) {
-    req.session.error = `<b>${json.error.type}</b> ${json.error.message}`
-    res.redirect('/parser')
+    console.log(`${json.error.type}: ${json.error.message}`);
+    res.render('pages/error', {message: `<b>${json.error.type}</b> ${json.error.message}`});
   }
 }
 
-// index: main view 
+// Index: main view 
 app.get('/', function(req, res) {
-  if (typeof(req.session.token) == "undefined") {
-    var button = {text: 'Login', href: '/auth'}
+  if (!req.session.token) {
+    var button = {text: 'Login', href: '/auth'};
   } else {
-    var button = {text: 'Logout', href: '/logout'}
+    var button = {text: 'Logout', href: '/logout'};
   }
   res.render('pages/index', {button: button});  
 });
@@ -101,7 +98,6 @@ app.get('/callback', function(req, res){
   if (req.query.state !== process.env.SECRET) {
     res.sendStatus(403);
   } else {
-    console.log(req.query.code)
     api.getToken(req.query.code, function(err, apires, json) {
       if (err) {
         console.log(err)
@@ -135,7 +131,7 @@ app.post('/parser', function(req, res){
   api.createList(req.session.token, title, function(err, apires, json){
 
     // check successful api call 
-    testApiCall(res, err, apires, json)
+    processApiCall(res, err, apires, json)
 
     var listId = json.id;
 
@@ -145,7 +141,10 @@ app.post('/parser', function(req, res){
       api.createTask(req.session.token, listId, task, function(errTask, apiresTask, jsonTask){
 
         // check successful api call 
-        testApiCall(res, errTask, apiresTask, jsonTask)
+        console.log('creating task')
+        console.log('\t' + task)
+        console.log('\t' + index)
+        processApiCall(res, errTask, apiresTask, jsonTask)
 
       })
     })
@@ -155,6 +154,30 @@ app.post('/parser', function(req, res){
   })
   
 })
+
+
+// development error handler
+// will print stacktrace
+if (app.get('env') === 'development') {
+  app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', {
+      message: err.message,
+      error: err
+    });
+  });
+}
+
+// production error handler
+// no stacktraces leaked to user
+app.use(function(err, req, res, next) {
+  res.status(err.status || 500);
+  res.render('pages/error', {
+    message: err.message,
+    error: {}
+  });
+});
+
 
 // run app
 app.listen(app.get('port'), '0.0.0.0', function() {
