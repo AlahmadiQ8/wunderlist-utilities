@@ -34,6 +34,7 @@ app.use(session({
             maxAge: null,},
   store: new RedisStore({client: client}),
   resave: false,
+  maxAge: (1000 * 60 * 60) * 2,
 }))
 
 
