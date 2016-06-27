@@ -143,9 +143,6 @@ app.post('/parser', function(req, res){
 
     // forEach is synch (blocking). but should switch to promises in the future 
     // create tasks
-    var length = tasks.length;
-    while (length)
-
 
     apiPromise.createTaskAsync(req.session.token, listId, tasks[0]).then(function(resTask) {
       if (apires.statusCode == 201) {
