@@ -152,10 +152,10 @@ app.post('/parser', function(req, res){
         console.log('successfully created task')
         console.log(resTask.body)
       }
-    }).catch(err){
+    }).catch( function(err){
       res.render('pages/error', {message: "Server error occured", error: err})
       res.end()
-    }
+    })
     // tasks.forEach(function(task, index, arr) {
     //   api.createTask(req.session.token, listId, task, function(errTask, apiresTask, jsonTask){
 
