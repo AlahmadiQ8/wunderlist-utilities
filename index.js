@@ -6,7 +6,9 @@ var client      = require('redis').createClient(process.env.REDIS_URL);
 var session     = require('express-session')
 var RedisStore  = require('connect-redis')(session);
 var morgan      = require('morgan')
+var Promise     = require("bluebird");
 var api         = require('./api.js')
+var apiPromise  = Promise.promisifyAll(require('./api.js'));
 
 var app         = express();
 
@@ -59,10 +61,14 @@ app.use(function(req, res, next){
 function processApiCall(res, err, apires, json){
   if (err) {
     console.log(err);
+    console.log('reached here')
     res.sendStatus(500);
+    res.end();
   } else if (apires.statusCode != 201) {
-    console.log(`${json.error.type}: ${json.error.message}`);
-    res.render('pages/error', {message: `<b>${json.error.type}</b> ${json.error.message}`});
+    console.log(`${json.error.type}: ${apires.statusCode} ${json.error.message}`);
+    console.log('no here')
+    res.render('pages/error', {message: `${json.error.type}: ${apires.statusCode} ${json.error.message}`, error: ''});
+    res.end()
   }
 }
 
@@ -137,17 +143,30 @@ app.post('/parser', function(req, res){
 
     // forEach is synch (blocking). but should switch to promises in the future 
     // create tasks
-    tasks.forEach(function(task, index, arr) {
-      api.createTask(req.session.token, listId, task, function(errTask, apiresTask, jsonTask){
+    var length = tasks.length;
+    while (length)
 
-        // check successful api call 
-        console.log('creating task')
-        console.log('\t' + task)
-        console.log('\t' + index)
-        processApiCall(res, errTask, apiresTask, jsonTask)
 
-      })
-    })
+    apiPromise.createTaskAsync(req.session.token, listId, tasks[0]).then(function(resTask) {
+      if (apires.statusCode == 201) {
+        console.log('successfully created task')
+        console.log(resTask.body)
+      }
+    }).catch(err){
+      res.render('pages/error', {message: "Server error occured", error: err})
+      res.end()
+    }
+    // tasks.forEach(function(task, index, arr) {
+    //   api.createTask(req.session.token, listId, task, function(errTask, apiresTask, jsonTask){
+
+    //     // check successful api call 
+    //     console.log('creating task')
+    //     console.log('\t' + task)
+    //     console.log('\t' + index)
+    //     processApiCall(res, errTask, apiresTask, jsonTask)
+
+    //   })
+    // })
 
     req.session.success = `<b>${title}</b> list created successfully`;
     res.redirect('/parser')
@@ -161,7 +180,7 @@ app.post('/parser', function(req, res){
 if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
     res.status(err.status || 500);
-    res.render('error', {
+    res.render('pages/error', {
       message: err.message,
       error: err
     });

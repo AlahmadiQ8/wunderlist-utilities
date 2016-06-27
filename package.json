@@ -10,6 +10,7 @@
   "author": "Mohammad Mohammad (AlahmadiQ8)",
   "license": "ISC",
   "dependencies": {
+    "bluebird": "^3.4.1",
     "body-parser": "^1.15.1",
     "connect-redis": "^3.1.0",
     "ejs": "^2.4.2",
