@@ -75,11 +75,11 @@ function processApiCall(res, err, apires, json){
 // Index: main view 
 app.get('/', function(req, res) {
   if (!req.session.token) {
-    var button = {text: 'Login', href: '/auth'};
+    res.render('pages/index', {button: {text: 'Login', href: '/auth'}});  
   } else {
-    var button = {text: 'Logout', href: '/logout'};
+    res.redirect('/parser');
   }
-  res.render('pages/index', {button: button});  
+  
 });
 
 
@@ -143,16 +143,22 @@ app.post('/parser', function(req, res){
 
     // forEach is synch (blocking). but should switch to promises in the future 
     // create tasks
-
-    apiPromise.createTaskAsync(req.session.token, listId, tasks[0]).then(function(resTask) {
-      if (apires.statusCode == 201) {
-        console.log('successfully created task')
-        console.log(resTask.body)
-      }
+    Promise.each(tasks, function(task, index) {
+      return apiPromise.createTaskAsync(req.session.token, listId, task)
+             .then(function(resTask){
+                console.log(resTask.statusCode)
+                console.log('created task id ' + index)
+      })
     }).catch( function(err){
       res.render('pages/error', {message: "Server error occured", error: err})
       res.end()
-    })
+    });
+    // apiPromise.createTaskAsync(req.session.token, listId, tasks[0]).then(function(resTask) {
+    //   if (apires.statusCode == 201) {
+    //     console.log('successfully created task')
+    //     console.log(resTask.body)
+    //   }
+    // })
     // tasks.forEach(function(task, index, arr) {
     //   api.createTask(req.session.token, listId, task, function(errTask, apiresTask, jsonTask){
 
