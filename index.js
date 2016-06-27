@@ -154,32 +154,14 @@ app.post('/parser', function(req, res){
                 console.log(resTask.statusCode)
                 console.log('created task id ' + index)
       })
+    }).then(function() {
+      req.session.success = `<b>${title}</b> list created successfully`;
+      res.redirect('/parser')
     }).catch( function(err){
       res.render('pages/error', {message: "Server error occured", error: err})
       res.end()
     });
-    // apiPromise.createTaskAsync(req.session.token, listId, tasks[0]).then(function(resTask) {
-    //   if (apires.statusCode == 201) {
-    //     console.log('successfully created task')
-    //     console.log(resTask.body)
-    //   }
-    // })
-    // tasks.forEach(function(task, index, arr) {
-    //   api.createTask(req.session.token, listId, task, function(errTask, apiresTask, jsonTask){
-
-    //     // check successful api call 
-    //     console.log('creating task')
-    //     console.log('\t' + task)
-    //     console.log('\t' + index)
-    //     processApiCall(res, errTask, apiresTask, jsonTask)
-
-    //   })
-    // })
-
-    req.session.success = `<b>${title}</b> list created successfully`;
-    res.redirect('/parser')
   })
-  
 })
 
 
