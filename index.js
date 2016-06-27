@@ -119,8 +119,13 @@ app.get('/callback', function(req, res){
 
 
 // parser page
-app.get('/parser', function(req, res){
-  if (req.query)
+app.get('/parser', function(req, res, next) {
+  if (!req.session.token) {
+    res.redirect('/auth');
+  } else {
+    next();
+  }
+}, function(req, res){
   res.render('pages/parser')
 })
 
