@@ -1,0 +1,36 @@
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+<script type="text/javascript">
+
+$(document).ready(function() {
+    
+    // dissmiss flash message
+    $('.js-dismiss').click(function(){
+      $(this).parent().remove();
+    })
+
+    // enable lists dropdown
+    $('select').material_select();
+
+    // disable list title text input if existing list is selected
+    $('#list_dropdown').change(function(){
+      var val = $('#list_dropdown option:selected').val();
+      console.log('triggered')
+      if (!val){
+        $('#list_title').prop( "disabled", false );
+      } else {
+        $('#list_title').val('');
+        $('#list_title').prop( "disabled", true );
+      }
+    });
+
+    // disable submit button after click to prevent duplicate requests
+    $("#tasks-form").submit(function () {
+      $("#submit-tasks").attr("disabled", true);
+      return true;
+    });
+
+
+});
+
+</script>
