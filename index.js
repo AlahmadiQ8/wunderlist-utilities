@@ -1,10 +1,14 @@
+var env = process.env.NODE_ENV
 
 var express     = require('express');
 var querystring = require('querystring');
 var bodyParser  = require('body-parser');
-var client      = require('redis').createClient(process.env.REDIS_URL);
+var client      = (env == 'production') ?
+                  require('redis').createClient(process.env.REDIS_URL)
+                  : undefined
 var session     = require('express-session')
-var RedisStore  = require('connect-redis')(session);
+var RedisStore  = (env == 'production')  ? require('connect-redis')(session) : undefined
+var FileStore   = (env == 'development') ? require('session-file-store')(session) : undefined
 var morgan      = require('morgan')
 var Promise     = require("bluebird");
 var api         = require('./api.js')
@@ -25,17 +29,20 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // Session configuration
-app.use(session({
+var sessionOptions = {
   name: 'server-session-cookie-id',
   secret: process.env.SECRET,
   saveUninitialized: true,
   cookie: { httpOnly: true, 
             secure: false, 
             maxAge: null,},
-  store: new RedisStore({client: client}),
   resave: false,
   maxAge: (1000 * 60 * 60) * 2,
-}))
+}
+sessionOptions.store = (env == 'production') 
+                       ? new RedisStore({client: client})
+                       : new FileStore;
+app.use(session(sessionOptions))
 
 
 // for message flashing
@@ -43,7 +50,7 @@ var flash = function(type, text) {
   var classes = (type === 'success' ? 'chip green lighten-4 green-text text-darken-1' : 'chip red lighten-4 red-text text-lighten-1')
   return {
     classes: classes,
-    text: text + '<i class="material-icons">close</i>'}
+    text: text + '<i class="material-icons js-dismiss">close</i>'}
 };
 
 // Session-persisted flash message middleware
@@ -58,20 +65,6 @@ app.use(function(req, res, next){
   next();
 });
 
-// Process api call
-function processApiCall(res, err, apires, json){
-  if (err) {
-    console.log(err);
-    console.log('reached here')
-    res.sendStatus(500);
-    res.end();
-  } else if (apires.statusCode != 201) {
-    console.log(`${json.error.type}: ${apires.statusCode} ${json.error.message}`);
-    console.log('no here')
-    res.render('pages/error', {message: `${json.error.type}: ${apires.statusCode} ${json.error.message}`, error: ''});
-    res.end()
-  }
-}
 
 // Index: main view 
 app.get('/', function(req, res) {
@@ -80,17 +73,22 @@ app.get('/', function(req, res) {
   } else {
     res.redirect('/parser');
   }
-  
 });
 
 
 // Redirect user to authenticate 
 app.get('/auth', function (req, res) {
+  var query = { 
+    client_id: process.env.CLIENT_ID,
+    state: process.env.SECRET
+  }
+  query.redirect_uri = (env == 'production') 
+                       ? 'http://wunderlist-parser.herokuapp.com/callback'
+                       : 'http://192.168.0.8:5000/callback';
   res.redirect('https://www.wunderlist.com/oauth/authorize?' +
-       querystring.stringify( { client_id: process.env.CLIENT_ID,
-                               redirect_uri: 'http://wunderlist-parser.herokuapp.com/callback',
-                               state: process.env.SECRET} ))
+       querystring.stringify(query))
 });
+
 
 // Logout 
 app.get('/logout', (req, res) => {
@@ -127,66 +125,71 @@ app.get('/parser', function(req, res, next) {
     next();
   }
 }, function(req, res){
-  res.render('pages/parser')
+  api.getLists(req.session.token, function(err, apires, json){
+    res.render('pages/parser', {lists: JSON.parse(json)})
+  })
 })
 
+
+// proccess post request
 app.post('/parser', function(req, res){
+  
   var title = req.body.title;
+
+  req.body.existingListId;
+
   var tasks = req.body.tasks.split(/\r?\n/).filter(function(str) {
     return /\S/.test(str);
   })
   if (!tasks.length) {
     req.session.error = '<b>Error:</b> No tasks given in the tasks feild'
+    res.redirect('/parser');
+    return;
   }
 
   // create list
-  api.createList(req.session.token, title, function(err, apires, json){
+  var promise = req.body.existingListId 
+                ? new Promise.resolve("")
+                : apiPromise.createListAsync(req.session.token, title);
+  promise
+  .then(function(apires){
+    if (apires && apires.statusCode != 201) {
+      console.log(`${json.error.type}: ${apires.statusCode} ${json.error.message}`);
+      req.session.error = `${json.error.type}: ${apires.statusCode} ${json.error.message}`
+      res.redirect('/parser');
+    }
 
-    // check successful api call 
-    processApiCall(res, err, apires, json)
+    var listId = req.body.existingListId || apires.body.id;
+    listId = Number(listId);
+    console.log(`list id is ${listId}`);
 
-    var listId = json.id;
-
-    // forEach is synch (blocking). but should switch to promises in the future 
-    // create tasks
-    Promise.each(tasks, function(task, index) {
+    return Promise.each(tasks, function(task, index) {
       return apiPromise.createTaskAsync(req.session.token, listId, task)
              .then(function(resTask){
-                console.log(resTask.statusCode)
-                console.log('created task id ' + index)
+                if (resTask && resTask.statusCode != 201) {
+                  console.log('error creating a task')
+                  console.log(`${resTask.body.error.type}: ${resTask.statusCode} ${resTask.body.message}`);
+                  return Promise.reject(new Error("error creating a task"))
+                } else {
+                  console.log(resTask.body.title)
+                  console.log('created task id ' + index)
+                }
       })
-    }).then(function() {
-      req.session.success = `<b>${title}</b> list created successfully`;
+    })
+  })
+  .then(function() {
+      if (title) { 
+        req.session.success = `<b>${title}</b> list created successfully`; 
+      }
+      else { 
+        req.session.success = `Tasks appended successfully`; 
+      }
       res.redirect('/parser')
-    }).catch( function(err){
-      res.render('pages/error', {message: "Server error occured", error: err})
-      res.end()
-    });
+  }).catch(function(err){
+    req.session.error = `${err.message}`;
+    res.redirect('/parser');
   })
 })
-
-
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('pages/error', {
-      message: err.message,
-      error: err
-    });
-  });
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.render('pages/error', {
-    message: err.message,
-    error: {}
-  });
-});
 
 
 // run app

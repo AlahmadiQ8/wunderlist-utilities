@@ -16,6 +16,15 @@ body {
   margin-bottom: 10px;
 }
 
+.create-list {
+  padding: 20px;
+  height: 76px;
+  width: 100%;
+}
+.create-list-container {
+  padding: 0 !important;
+}
+
 
 /* label color */
 .input-field label {
@@ -81,6 +90,16 @@ button.create-list:active, button.create-list:focus {
 .input-field textarea {
  border-bottom: 1px solid #64b5f6;
  box-shadow: 0 1px 0 0 #64b5f6;
+}
+
+
+/*  */
+.select option {
+ border-bottom: 1px solid #64b5f6;
+ box-shadow: 0 1px 0 0 #64b5f6;
+}
+.select-wrapper  input[type=text] {
+ color: #9e9e9e;
 }
 
 

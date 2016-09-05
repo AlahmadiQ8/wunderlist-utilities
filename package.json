@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "start": "NODE_ENV=development nodemon --debug server.js app",
+    "start": "NODE_ENV=development node index.js",
     "deploy": "git commit -a -m 'deploy'; git push heroku master; heroku open; heroku logs --tail"
   },
   "name": "wunderlist-parser",

@@ -17,7 +17,7 @@
           <div class="divider"></div>
 
           <% if (locals.message) { %>
-          <div class="<%= message.classes %>">
+          <div class="<%= message.classes %> .js-dismiss">
             <%- message.text %>
           </div>  
           <% } %>
@@ -27,26 +27,43 @@
             <input id="list_title" type="text" name='title' class="validate" required>
             <label for="list_title">List Title</label>
           </div>
+
+          <div class="input-field">
+          <i class="material-icons prefix grey-text">assignment</i>
+            <select id="list_dropdown" name='existingListId'>
+              <option value="" selected>Append to existing list</option>
+
+              <% lists.forEach(function(list){ %>
+                <option value="<%- list.id %>"><%- list.title %></option>
+              <% }); %>
+            </select>
+          </div>
+
           <div class="input-field">
             <i class="material-icons prefix grey-text">mode_edit</i>
             <textarea id="textarea1" name='tasks' class="materialize-textarea" required></textarea>
             <label for="textarea1">Tasks</label>
           </div>
 
+
+
+
+
           <p class='notes grey-text right-align'>* Empty lines are ignored</p>
 
         </div> <!-- end of card-content -->
-        <div class="card-action center-align blue lighten-2">
-          <button class='btn-flat white-text create-list' type='submit'>Create List</button>
+        <div class="create-list-container card-action center-align blue lighten-2">
+          <button id='submit-tasks' class='btn-flat white-text create-list' type='submit'>Create List</button>
         </div>
       </form> <!-- end of card -->
       <p class="grey-text last center-align">Click <a href='/logout'>here</a> to start over.</p>
+
 
     </div>
   </div>
 </div>
 
-
+<% include ../partials/footer-materialize.ejs %>
 </body>
 
 </html>

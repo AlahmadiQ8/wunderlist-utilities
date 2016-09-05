@@ -35,6 +35,13 @@ module.exports = {
       headers : headers(token),
       json : { list_id: listId, title: task, completed: false }
     }, callback)
+  },
+
+  getLists: function getList(token, callback) {
+    request.get({
+      url : 'https://a.wunderlist.com/api/v1/lists',
+      headers : headers(token)
+    }, callback)
   }
 
 }
