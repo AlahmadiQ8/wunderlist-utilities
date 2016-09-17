@@ -6,6 +6,12 @@ Project is currently hosted at https://wunderlist-parser.herokuapp.com/
 
 ## History
 
+### 2016-09-05
+
+* You can now append tasks to existing lists
+* Some minor fixes
+* Code refactoring
+
 ### 2016-06-26 
 
 * Switched to redis for session store 
