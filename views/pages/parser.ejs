@@ -17,7 +17,7 @@
           <div class="divider"></div>
 
           <% if (locals.message) { %>
-          <div class="<%= message.classes %> .js-dismiss">
+          <div class="<%= message.classes %> js-dismiss">
             <%- message.text %>
           </div>  
           <% } %>
@@ -53,7 +53,7 @@
 
         </div> <!-- end of card-content -->
         <div class="create-list-container card-action center-align blue lighten-2">
-          <button id='submit-tasks' class='btn-flat white-text create-list' type='submit'>Create List</button>
+          <button class='btn-flat white-text create-list' type='submit'>Create List</button>
         </div>
       </form> <!-- end of card -->
       <p class="grey-text last center-align">Click <a href='/logout'>here</a> to start over.</p>
