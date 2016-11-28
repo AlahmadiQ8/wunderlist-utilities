@@ -33,7 +33,7 @@ module.exports = {
     request.post({
       url : 'https://a.wunderlist.com/api/v1/tasks',
       headers : headers(token),
-      json : { list_id: listId, title: task, completed: false }
+      json : { list_id: listId, title: task.title, completed: false, due_date: task.due_date  }
     }, callback)
   },
 

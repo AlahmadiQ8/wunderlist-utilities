@@ -133,7 +133,7 @@ app.get('/parser', function(req, res, next) {
 
 // proccess post request
 app.post('/parser', function(req, res){
-  
+
   var title = req.body.title;
 
   req.body.existingListId;
@@ -147,8 +147,27 @@ app.post('/parser', function(req, res){
     return;
   }
 
+  // Parse dates from task into a due date
+  tasks = tasks.map(function(task){
+
+    var title = task;
+    var due_date = null;
+
+    // Formats accepted: dd/mm/yyyy, dd-mm-yyyy, dd.mm.yyyy
+    var regex = /(0?[1-9]|[12][0-9]|3[01])[\/\-\.](0?[1-9]|1[012])[\/\-\.](\d{4})/;
+
+    if (regex.test(title)) {
+      var parsed = title.match(regex);
+      console.log(parsed[3] + '-' + (parsed[2].length < 2 ? '0' : '') + parsed[2] + '-' + (parsed[1].length < 2 ? '0' : '') + parsed[1] + 'T00:00:00');
+      due_date = new Date(parsed[3] + '-' + (parsed[2].length < 2 ? '0' : '') + parsed[2] + '-' + (parsed[1].length < 2 ? '0' : '') + parsed[1] + 'T00:00:00').toISOString();
+      title = title.replace(regex, '').trim();
+    }
+
+    return { title: title, due_date: due_date };
+  });
+
   // create list
-  var promise = req.body.existingListId 
+  var promise = req.body.existingListId
                 ? new Promise.resolve("")
                 : apiPromise.createListAsync(req.session.token, title);
   promise
